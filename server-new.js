@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const multer = require("multer");
 const fs = require("fs");
@@ -20,6 +21,7 @@ app.use(express.json());
 
 const upload = multer({ dest: "uploads/" });
 
+const PORT = process.env.PORT || 3000;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 async function convertPdfToBase64Image(pdfPath) {
@@ -140,8 +142,6 @@ app.post("/upload-file", upload.array("files"), async (req, res) => {
     }
 
     const parsed = parseWijnSpijsTekst(fullText);
-    console.log("✅ Analyse succesvol:", parsed);
-    
     res.json({ result: parsed });
   } catch (err) {
     console.error("❌ Analyse mislukt:", err.message);
@@ -149,7 +149,6 @@ app.post("/upload-file", upload.array("files"), async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`✅ Server is running on port ${PORT}`);
 });
