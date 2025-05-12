@@ -20,7 +20,6 @@ app.use(express.json());
 
 const upload = multer({ dest: "uploads/" });
 
-const PORT = process.env.PORT || 3000;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 async function convertPdfToBase64Image(pdfPath) {
@@ -150,6 +149,7 @@ app.post("/upload-file", upload.array("files"), async (req, res) => {
   }
 });
 
-app.listen(3000, () => {
-  console.log("Server is running on http://localhost:3000");
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`✅ Server is running on port ${PORT}`);
 });
