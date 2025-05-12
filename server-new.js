@@ -114,6 +114,7 @@ app.post("/upload-file", upload.array("files"), async (req, res) => {
     );
 
     const fullText = completion.data.choices[0].message.content;
+    console.log("✅ OpenAI response:", fullText);
 
     function parseWijnSpijsTekst(text) {
       const items = text.split(/(?=Naam gerecht:)/g);
