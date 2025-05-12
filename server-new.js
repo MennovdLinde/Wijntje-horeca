@@ -10,7 +10,7 @@ const app = express();
 const upload = multer({ dest: "uploads/" });
 
 app.use(cors({
-  origin: 'https://mennovdlinde.github.io',
+  origin: ['https://mennovdlinde.github.io', 'http://localhost:8000'],
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type']
 }));
