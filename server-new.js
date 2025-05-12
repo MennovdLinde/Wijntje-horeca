@@ -1,4 +1,3 @@
-require("dotenv").config();
 const express = require("express");
 const multer = require("multer");
 const fs = require("fs");
@@ -7,7 +6,9 @@ const axios = require("axios");
 const { createCanvas } = require("canvas");
 
 const app = express();
-const upload = multer({ dest: "uploads/" });
+
+// ✅ CORS before anything else
+app.options('*', cors());  // handle preflight for all routes
 
 app.use(cors({
   origin: ['https://mennovdlinde.github.io', 'http://localhost:8000'],
@@ -16,6 +17,8 @@ app.use(cors({
 }));
 
 app.use(express.json());
+
+const upload = multer({ dest: "uploads/" });
 
 const PORT = process.env.PORT || 3000;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
