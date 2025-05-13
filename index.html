@@ -33,6 +33,14 @@
       transition: all 0.3s ease-in-out;
     }
 
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none;
+    }
+
+
     .custom-btn:hover {
       transform: scale(1.05);
     }
@@ -165,6 +173,7 @@
 
     async function uploadMenus() {
       const files = document.getElementById("menuFiles").files;
+      const button = document.getElementById("wijnspijsBtn");
       if (!files.length) {
         alert("Upload minstens één afbeelding of PDF.");
         return false;
@@ -174,6 +183,8 @@
       for (const file of files) {
         formData.append("files", file);
       }
+
+      button.disabled = true;
 
       try {
         // Leeg vorige resultaten
@@ -221,6 +232,10 @@
         console.error("❌ Fout bij upload:", err);
         alert("Upload mislukt");
         return false;
+      }
+      finally {
+        // ✅ Re-enable the button
+        button.disabled = false;
       }
     }
 
