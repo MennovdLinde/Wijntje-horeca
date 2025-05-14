@@ -195,7 +195,7 @@
         // Leeg vorige resultaten
         document.getElementById("resultsContainer").innerHTML = "";
 
-        const response = await fetch("http://localhost:3000/upload-file", {
+        const response = await fetch("https://wijntje-horeca-c62f7c846146.herokuapp.com/upload-file", {
           method: "POST",
           body: formData,
         });
@@ -263,7 +263,7 @@
         const containerEl = document.getElementById("resultsContainer");
         containerEl.innerHTML = "";
 
-        const response = await fetch("http://localhost:3000/upload-file-wine", {
+        const response = await fetch("https://wijntje-horeca-c62f7c846146.herokuapp.com/upload-file-wine", {
           method: "POST",
           body: formData,
         });
@@ -323,7 +323,7 @@ Regio: "${wijn.regio}"
 Druiven: "${wijn.druiven}"`).join("\n\n");
 
       try {
-        const response = await fetch("http://localhost:3000/follow-up", {
+        const response = await fetch("https://wijntje-horeca-c62f7c846146.herokuapp.com/follow-up", {
           method: "POST",
           headers: {"Content-Type": "application/json"},
           body: JSON.stringify({Wijnen: wineText}),
