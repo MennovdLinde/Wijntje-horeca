@@ -126,7 +126,9 @@
   <div id="screen1" class="screen bg-primary text-white">
     <h1>Wijnkaart</h1>
     <button class="btn btn-light mt-4" id="Terug" onclick="goBack()">Terug</button>
+    <div id="resultsContainer" class="text-start w-75 p-4"></div>
   </div>
+
   <!-- Scherm 2 -->
   <div id="screen2" class="screen bg-success text-white">
     <h1>Wijnspijs</h1>
@@ -135,6 +137,9 @@
   </div>
 
   <script>
+    let uploadedWineList = [];
+    let followUpResults = {};
+
     async function handleWijnspijsClick() {
       const files = document.getElementById("menuFiles").files;
       if (!files.length) {
@@ -190,7 +195,7 @@
         // Leeg vorige resultaten
         document.getElementById("resultsContainer").innerHTML = "";
 
-        const response = await fetch("https://wijntje-horeca-c62f7c846146.herokuapp.com/upload-file", {
+        const response = await fetch("http://localhost:3000/upload-file", {
           method: "POST",
           body: formData,
         });
@@ -241,6 +246,7 @@
 
     async function uploadWine() {
       const files = document.getElementById("wineFiles").files;
+      const button = document.getElementById("wijnkaartBtn")
       if (!files.length) {
         alert("Upload minstens één afbeelding of PDF.");
         return;
@@ -248,22 +254,133 @@
 
       const formData = new FormData();
       for (const file of files) {
-        formData.append("files", file); // 'files' matches multer field
+        formData.append("files", file);
       }
 
+      button.disabled = true;
+
       try {
-        const response = await fetch("https://wijntje-horeca-c62f7c846146.herokuapp.com/upload-file-wine", {
+        const containerEl = document.getElementById("resultsContainer");
+        containerEl.innerHTML = "";
+
+        const response = await fetch("http://localhost:3000/upload-file-wine", {
           method: "POST",
           body: formData,
         });
 
+        if (!response.ok) {
+          throw new Error("Upload mislukt");
+        }
+
         const data = await response.json();
-        console.log("✅ Analyse resultaat:", data);
+        const wines = data.result;
+
+        uploadedWineList = wines;
+
+        wines.forEach((wijn) => {
+          const container = document.createElement("div");
+          container.className = "p-3 m-3 border rounded";
+
+          const naam = document.createElement("h4");
+          naam.innerText = wijn.naam;
+          container.appendChild(naam);
+
+          const wijnhuis = document.createElement("p");
+          wijnhuis.innerHTML = `<strong>Wijnhuis:</strong> ${wijn.wijnhuis}`;
+          container.appendChild(wijnhuis);
+
+          const regio = document.createElement("p");
+          regio.innerHTML = `<strong>Regio:</strong> ${wijn.regio}`;
+          container.appendChild(regio);
+
+          const druiven = document.createElement("p");
+          druiven.innerHTML = `<strong>Druiven:</strong> ${wijn.druiven}`;
+          container.appendChild(druiven);
+
+          containerEl.appendChild(container);
+        });
+
+        goToScreen('screen1');
+
+        await sendFollowUp(wines);
+
+        return true;
       } catch (err) {
         console.error("❌ Fout bij upload:", err);
         alert("Upload mislukt");
+        return false;
+      } finally {
+        button.disabled = false;
       }
     }
+
+    async function sendFollowUp(wines) {
+      // Format wine data as required by your prompt
+      const wineText = wines.map(wijn =>
+        `Naam: "${wijn.naam}"
+Wijnhuis: "${wijn.wijnhuis}"
+Regio: "${wijn.regio}"
+Druiven: "${wijn.druiven}"`).join("\n\n");
+
+      try {
+        const response = await fetch("http://localhost:3000/follow-up", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({Wijnen: wineText}),
+        });
+
+        if (!response.ok) throw new Error("Follow-up mislukt");
+
+        const data = await response.json();
+        const text = data.result;
+
+        const sections = text.split(/(?=Naam: ")/g);
+        wines.forEach((wijn, index) => {
+          followUpResults[wijn.naam] = sections[index]?.trim() || "Geen extra info.";
+        });
+
+        renderWineResults(wines);
+
+
+      } catch (err) {
+        console.error("❌ Fout bij follow-up:", err);
+      }
+    }
+
+    function renderWineResults(wines) {
+      const containerEl = document.getElementById("resultsContainer");
+      containerEl.innerHTML = "";
+
+      wines.forEach((wijn) => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "p-3 m-3 border rounded";
+
+        const toggle = document.createElement("h4");
+        toggle.style.cursor = "pointer";
+        toggle.innerText = wijn.naam;
+        toggle.onclick = () => {
+          dropdown.classList.toggle("d-none");
+        };
+
+        const wijnInfo = document.createElement("p");
+        wijnInfo.innerHTML = `<strong>Wijnhuis:</strong> ${wijn.wijnhuis}<br>
+                          <strong>Regio:</strong> ${wijn.regio}<br>
+                          <strong>Druiven:</strong> ${wijn.druiven}`;
+
+        const dropdown = document.createElement("div");
+        dropdown.className = "mt-3 d-none";
+        dropdown.style.backgroundColor = "#ffffff22";
+        dropdown.style.padding = "10px";
+        dropdown.innerText = followUpResults[wijn.naam] || "Geen extra informatie.";
+
+        wrapper.appendChild(toggle);
+        wrapper.appendChild(wijnInfo);
+        wrapper.appendChild(dropdown);
+
+        containerEl.appendChild(wrapper);
+      });
+    }
+
   </script>
 
 </body>
