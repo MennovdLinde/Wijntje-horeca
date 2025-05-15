@@ -58,7 +58,8 @@
       display: flex;
     }
 
-    #resultsContainer {
+    #wijnkaartResults,
+    #wijnspijsResults {
       max-height: 80vh;
       overflow-y: auto;
       background-color: rgba(255, 255, 255, 0.1);
@@ -67,9 +68,11 @@
       -ms-overflow-style: none;
     }
 
-    #resultsContainer::-webkit-scrollbar {
+    #wijnkaartResults::-webkit-scrollbar,
+    #wijnspijsResults::-webkit-scrollbar {
       display: none;
     }
+
 
     .button-screen {
       display: flex;
@@ -106,18 +109,12 @@
 
     <div class="button-screen">
       <button class="btn btn-primary custom-btn" id="wijnkaartBtn" onclick="handleWijnkaartClick()">Wijnkaart</button>
-      <div class="m-4 text-dark border border-dark rounded p-3">
-        <label for="wineFiles">Upload wijnkaart:</label>
-        <input type="file" id="wineFiles" multiple accept="image/*,application/pdf" class="form-control mb-2" />
-      </div>
+
     </div>
 
     <div class="button-screen">
       <button class="btn btn-success custom-btn" id="wijnspijsBtn" onclick="handleWijnspijsClick()">Wijnspijs</button>
-      <div class="m-4 text-dark border border-dark rounded p-3">
-        <label for="menuFiles">Upload wijn- en menukaarten:</label>
-        <input type="file" id="menuFiles" multiple accept="image/*,application/pdf" class="form-control mb-2" />
-      </div>
+
     </div>
 
   </div>
@@ -126,46 +123,17 @@
   <div id="screen1" class="screen bg-primary text-white">
     <h1>Wijnkaart</h1>
     <button class="btn btn-light mt-4" id="Terug" onclick="goBack()">Terug</button>
-    <div id="resultsContainer" class="text-start w-75 p-4"></div>
+    <div id="wijnkaartResults" class="text-start w-75 p-4"></div>
   </div>
 
-  <!-- Scherm 2 -->
   <div id="screen2" class="screen bg-success text-white">
     <h1>Wijnspijs</h1>
     <button class="btn btn-light mt-4" id="Terug" onclick="goBack()">Terug</button>
-    <div id="resultsContainer" class="text-start w-75 p-4"></div>
+    <div id="wijnspijsResults" class="text-start w-75 p-4"></div>
   </div>
 
+
   <script>
-    let uploadedWineList = [];
-    let followUpResults = {};
-
-    async function handleWijnspijsClick() {
-      const files = document.getElementById("menuFiles").files;
-      if (!files.length) {
-        alert("Upload eerst een menukaart en wijnkaart voordat je verder gaat.");
-        return;
-      }
-
-      const uploadOk = await uploadMenus();
-      if (uploadOk) {
-        goToScreen('screen2');
-      }
-    }
-
-    async function handleWijnkaartClick() {
-      const files = document.getElementById("wineFiles").files;
-      if (!files.length) {
-        alert("Upload eerst een wijnkaart voordat je verder gaat.");
-        return;
-      }
-
-      const uploadOk = await uploadWine();
-      if (uploadOk) {
-        goToScreen('screen1');
-      }
-    }
-
     function goToScreen(screenId) {
       document.getElementById('home-screen').style.display = 'none';
       document.getElementById(screenId).classList.add('active');
@@ -176,208 +144,114 @@
       document.getElementById('home-screen').style.display = 'flex';
     }
 
-    async function uploadMenus() {
-      const files = document.getElementById("menuFiles").files;
-      const button = document.getElementById("wijnspijsBtn");
-      if (!files.length) {
-        alert("Upload minstens één afbeelding of PDF.");
-        return false;
-      }
+    async function handleWijnkaartClick() {
+      // Haal wijnkaart JSON lokaal op
+      const response = await fetch('wijnkaart.json');
+      const wijnkaart = await response.json();
 
-      const formData = new FormData();
-      for (const file of files) {
-        formData.append("files", file);
-      }
+      renderWijnkaart(wijnkaart);
+      goToScreen('screen1');
+    }
 
-      button.disabled = true;
+    async function handleWijnspijsClick() {
+      // Haal wijnspijs JSON lokaal op
+      const response = await fetch('wijnspijs.json');
+      const wijnspijs = await response.json();
 
-      try {
-        // Leeg vorige resultaten
-        document.getElementById("resultsContainer").innerHTML = "";
+      renderWijnspijs(wijnspijs);
+      goToScreen('screen2');
+    }
 
-        const response = await fetch("https://wijntje-horeca-c62f7c846146.herokuapp.com/upload-file", {
-          method: "POST",
-          body: formData,
-        });
+    function renderWijnkaart(wijnen) {
+      const container = document.getElementById("wijnkaartResults");
+      container.innerHTML = "";
 
-        if (!response.ok) {
-          throw new Error("Upload mislukt");
+      wijnen.forEach((item, index) => {
+        const div = document.createElement("div");
+        div.className = "p-3 m-3 border rounded";
+
+        // Title
+        const naam = document.createElement("h4");
+        naam.innerText = `${index + 1}: ${item.Naam}`;
+        div.appendChild(naam);
+
+        // Each field as <p>
+        const wijnhuis = document.createElement("p");
+        wijnhuis.innerHTML = `<strong>Wijnhuis:</strong> ${item.Wijnhuis}`;
+        div.appendChild(wijnhuis);
+
+        const druivensoort = document.createElement("p");
+        druivensoort.innerHTML = `<strong>Druivensoort:</strong> ${item.Druivensoort}`;
+        div.appendChild(druivensoort);
+
+        const kleur = document.createElement("p");
+        kleur.innerHTML = `<strong>Kleur:</strong> ${item.Kleur}`;
+        div.appendChild(kleur);
+
+        const regio = document.createElement("p");
+        regio.innerHTML = `<strong>Regio:</strong> ${item.Regio}`;
+        div.appendChild(regio);
+
+        const beschrijvingWijn = document.createElement("p");
+        beschrijvingWijn.innerHTML = `<strong>Beschrijving:</strong> ${item["Beschrijving-Wijn"]}`;
+        div.appendChild(beschrijvingWijn);
+
+        if (item["Bijpassende-Gerechten"] && Array.isArray(item["Bijpassende-Gerechten"])) {
+          const gerechten = document.createElement("p");
+          gerechten.innerHTML = `<strong>Bijpassende gerechten:</strong> ${item["Bijpassende-Gerechten"].join(', ')}`;
+          div.appendChild(gerechten);
         }
 
-        const data = await response.json();
-        const resultArray = data.result;
-
-        // Toon resultaat per item
-        resultArray.forEach(item => {
-          const container = document.createElement("div");
-          container.className = "p-3 m-3 border rounded";
-
-          const gerecht = document.createElement("h4");
-          gerecht.innerText = `${item.gerecht}`;
-          container.appendChild(gerecht);
-
-          item.wijnen.forEach((wijn, index) => {
-            const wijnTitle = document.createElement("strong");
-            wijnTitle.innerText = `${index + 1}: ${wijn.naam}`;
-            const beschrijving = document.createElement("p");
-            beschrijving.innerText = wijn.beschrijving;
-
-            container.appendChild(wijnTitle);
-            container.appendChild(document.createElement("br"));
-            container.appendChild(beschrijving);
-          });
-
-          document.getElementById("resultsContainer").appendChild(container);
-        });
-
-        goToScreen('screen2'); // verplaats pas na ophalen + tonen
-        return true;
-
-      } catch (err) {
-        console.error("❌ Fout bij upload:", err);
-        alert("Upload mislukt");
-        return false;
-      }
-      finally {
-        // ✅ Re-enable the button
-        button.disabled = false;
-      }
-    }
-
-    async function uploadWine() {
-      const files = document.getElementById("wineFiles").files;
-      const button = document.getElementById("wijnkaartBtn")
-      if (!files.length) {
-        alert("Upload minstens één afbeelding of PDF.");
-        return;
-      }
-
-      const formData = new FormData();
-      for (const file of files) {
-        formData.append("files", file);
-      }
-
-      button.disabled = true;
-
-      try {
-        const containerEl = document.getElementById("resultsContainer");
-        containerEl.innerHTML = "";
-
-        const response = await fetch("https://wijntje-horeca-c62f7c846146.herokuapp.com/upload-file-wine", {
-          method: "POST",
-          body: formData,
-        });
-
-        if (!response.ok) {
-          throw new Error("Upload mislukt");
+        if (item.Smaken && Array.isArray(item.Smaken)) {
+          const smaken = document.createElement("p");
+          smaken.innerHTML = `<strong>Smaken:</strong> ${item.Smaken.join(', ')}`;
+          div.appendChild(smaken);
         }
 
-        const data = await response.json();
-        const wines = data.result;
+        // Smaakkenmerken (optioneel)
+        if (item.Smaakkenmerken) {
+          const kenmerken = document.createElement("p");
+          kenmerken.innerHTML = `<strong>Smaakkenmerken:</strong> Fruit: ${item.Smaakkenmerken.Fruit}, Body: ${item.Smaakkenmerken.Body}, Tanine-Droog: ${item.Smaakkenmerken["Tanine-Droog"]}, Zuren: ${item.Smaakkenmerken.Zuren}`;
+          div.appendChild(kenmerken);
+        }
 
-        uploadedWineList = wines;
-
-        wines.forEach((wijn) => {
-          const container = document.createElement("div");
-          container.className = "p-3 m-3 border rounded";
-
-          const naam = document.createElement("h4");
-          naam.innerText = wijn.naam;
-          container.appendChild(naam);
-
-          const wijnhuis = document.createElement("p");
-          wijnhuis.innerHTML = `<strong>Wijnhuis:</strong> ${wijn.wijnhuis}`;
-          container.appendChild(wijnhuis);
-
-          const regio = document.createElement("p");
-          regio.innerHTML = `<strong>Regio:</strong> ${wijn.regio}`;
-          container.appendChild(regio);
-
-          const druiven = document.createElement("p");
-          druiven.innerHTML = `<strong>Druiven:</strong> ${wijn.druiven}`;
-          container.appendChild(druiven);
-
-          containerEl.appendChild(container);
-        });
-
-        goToScreen('screen1');
-
-        await sendFollowUp(wines);
-
-        return true;
-      } catch (err) {
-        console.error("❌ Fout bij upload:", err);
-        alert("Upload mislukt");
-        return false;
-      } finally {
-        button.disabled = false;
-      }
+        container.appendChild(div);
+      });
     }
 
-    async function sendFollowUp(wines) {
-      // Format wine data as required by your prompt
-      const wineText = wines.map(wijn =>
-        `Naam: "${wijn.naam}"
-Wijnhuis: "${wijn.wijnhuis}"
-Regio: "${wijn.regio}"
-Druiven: "${wijn.druiven}"`).join("\n\n");
 
-      try {
-        const response = await fetch("https://wijntje-horeca-c62f7c846146.herokuapp.com/follow-up", {
-          method: "POST",
-          headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({Wijnen: wineText}),
-        });
+    function renderWijnspijs(gerechten) {
+      const container = document.getElementById("wijnspijsResults");
+      container.innerHTML = "";
 
-        if (!response.ok) throw new Error("Follow-up mislukt");
+      gerechten.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "p-3 m-3 border rounded";
 
-        const data = await response.json();
-        const text = data.result;
+        // Gerecht
+        const gerecht = document.createElement("h4");
+        gerecht.innerText = item["Gerecht"];
+        div.appendChild(gerecht);
 
-        const sections = text.split(/(?=Naam: ")/g);
-        wines.forEach((wijn, index) => {
-          followUpResults[wijn.naam] = sections[index]?.trim() || "Geen extra info.";
-        });
+        // Wijn 1
+        const wijn1Title = document.createElement("strong");
+        wijn1Title.innerText = `1: ${item["Wijn 1"]}`;
+        div.appendChild(wijn1Title);
+        div.appendChild(document.createElement("br"));
+        const beschrijving1 = document.createElement("p");
+        beschrijving1.innerText = item["Beschrijving 1"];
+        div.appendChild(beschrijving1);
 
-        renderWineResults(wines);
+        // Wijn 2
+        const wijn2Title = document.createElement("strong");
+        wijn2Title.innerText = `2: ${item["Wijn 2"]}`;
+        div.appendChild(wijn2Title);
+        div.appendChild(document.createElement("br"));
+        const beschrijving2 = document.createElement("p");
+        beschrijving2.innerText = item["Beschrijving 2"];
+        div.appendChild(beschrijving2);
 
-
-      } catch (err) {
-        console.error("❌ Fout bij follow-up:", err);
-      }
-    }
-
-    function renderWineResults(wines) {
-      const containerEl = document.getElementById("resultsContainer");
-      containerEl.innerHTML = "";
-
-      wines.forEach((wijn) => {
-        const wrapper = document.createElement("div");
-        wrapper.className = "p-3 m-3 border rounded";
-
-        const toggle = document.createElement("h4");
-        toggle.style.cursor = "pointer";
-        toggle.innerText = wijn.naam;
-        toggle.onclick = () => {
-          dropdown.classList.toggle("d-none");
-        };
-
-        const wijnInfo = document.createElement("p");
-        wijnInfo.innerHTML = `<strong>Wijnhuis:</strong> ${wijn.wijnhuis}<br>
-                          <strong>Regio:</strong> ${wijn.regio}<br>
-                          <strong>Druiven:</strong> ${wijn.druiven}`;
-
-        const dropdown = document.createElement("div");
-        dropdown.className = "mt-3 d-none";
-        dropdown.style.backgroundColor = "#ffffff22";
-        dropdown.style.padding = "10px";
-        dropdown.innerText = followUpResults[wijn.naam] || "Geen extra informatie.";
-
-        wrapper.appendChild(toggle);
-        wrapper.appendChild(wijnInfo);
-        wrapper.appendChild(dropdown);
-
-        containerEl.appendChild(wrapper);
+        container.appendChild(div);
       });
     }
 
