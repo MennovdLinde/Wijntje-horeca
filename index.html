@@ -22,6 +22,24 @@
       height: 100%;
     }
 
+    .accordion-item {
+      border-radius: 5px !important;
+      border: 1.5px solid #fff !important;
+      margin-bottom: 25px !important;
+      overflow: hidden;
+      transition: transform 0.32s cubic-bezier(.5, 1.4, .55, 1), box-shadow 0.32s;
+    }
+
+    .accordion-item.featured {
+      transform: scale(1.03);
+      box-shadow: 0 8px 26px rgba(0, 0, 0, 0.15);
+      z-index: 2;
+    }
+
+    .accordion .accordion-item:not(:first-child) {
+      border-top: 1.5px solid #fff !important;
+    }
+
     .custom-btn {
       width: 300px;
       height: 300px;
@@ -105,7 +123,6 @@
 
   <!-- Startscherm -->
   <div id="home-screen" class="center-screen">
-    <h1 class="mb-4">Naam horeca zaak</h1>
 
     <div class="button-screen">
       <button class="btn btn-primary custom-btn" id="wijnkaartBtn" onclick="handleWijnkaartClick()">Wijnkaart</button>
@@ -121,13 +138,11 @@
 
   <!-- Scherm 1 -->
   <div id="screen1" class="screen bg-primary text-white">
-    <h1>Wijnkaart</h1>
     <button class="btn btn-light mt-4" id="Terug" onclick="goBack()">Terug</button>
     <div id="wijnkaartResults" class="text-start w-75 p-4"></div>
   </div>
 
   <div id="screen2" class="screen bg-success text-white">
-    <h1>Wijnspijs</h1>
     <button class="btn btn-light mt-4" id="Terug" onclick="goBack()">Terug</button>
     <div id="wijnspijsResults" class="text-start w-75 p-4"></div>
   </div>
@@ -166,58 +181,50 @@
       const container = document.getElementById("wijnkaartResults");
       container.innerHTML = "";
 
+      // Unieke id voor deze accordion groep (ivm Bootstrap)
+      const accordionId = "wijnAccordion";
+      const accordion = document.createElement("div");
+      accordion.className = "accordion";
+      accordion.id = accordionId;
+
       wijnen.forEach((item, index) => {
-        const div = document.createElement("div");
-        div.className = "p-3 m-3 border rounded";
+        const wineId = `wijn-${index}`;
 
-        // Title
-        const naam = document.createElement("h4");
-        naam.innerText = `${index + 1}: ${item.Naam}`;
-        div.appendChild(naam);
+        // Accordion-item div
+        const accItem = document.createElement("div");
+        accItem.className = "accordion-item bg-transparent";
 
-        // Each field as <p>
-        const wijnhuis = document.createElement("p");
-        wijnhuis.innerHTML = `<strong>Wijnhuis:</strong> ${item.Wijnhuis}`;
-        div.appendChild(wijnhuis);
-
-        const druivensoort = document.createElement("p");
-        druivensoort.innerHTML = `<strong>Druivensoort:</strong> ${item.Druivensoort}`;
-        div.appendChild(druivensoort);
-
-        const kleur = document.createElement("p");
-        kleur.innerHTML = `<strong>Kleur:</strong> ${item.Kleur}`;
-        div.appendChild(kleur);
-
-        const regio = document.createElement("p");
-        regio.innerHTML = `<strong>Regio:</strong> ${item.Regio}`;
-        div.appendChild(regio);
-
-        const beschrijvingWijn = document.createElement("p");
-        beschrijvingWijn.innerHTML = `<strong>Beschrijving:</strong> ${item["Beschrijving-Wijn"]}`;
-        div.appendChild(beschrijvingWijn);
-
-        if (item["Bijpassende-Gerechten"] && Array.isArray(item["Bijpassende-Gerechten"])) {
-          const gerechten = document.createElement("p");
-          gerechten.innerHTML = `<strong>Bijpassende gerechten:</strong> ${item["Bijpassende-Gerechten"].join(', ')}`;
-          div.appendChild(gerechten);
-        }
-
-        if (item.Smaken && Array.isArray(item.Smaken)) {
-          const smaken = document.createElement("p");
-          smaken.innerHTML = `<strong>Smaken:</strong> ${item.Smaken.join(', ')}`;
-          div.appendChild(smaken);
-        }
-
-        // Smaakkenmerken (optioneel)
-        if (item.Smaakkenmerken) {
-          const kenmerken = document.createElement("p");
-          kenmerken.innerHTML = `<strong>Smaakkenmerken:</strong> Fruit: ${item.Smaakkenmerken.Fruit}, Body: ${item.Smaakkenmerken.Body}, Tanine-Droog: ${item.Smaakkenmerken["Tanine-Droog"]}, Zuren: ${item.Smaakkenmerken.Zuren}`;
-          div.appendChild(kenmerken);
-        }
-
-        container.appendChild(div);
+        // HEADER: Titel, fles en beschrijving
+        accItem.innerHTML = `
+      <h2 class="accordion-header" id="heading-${wineId}">
+        <button class="accordion-button collapsed bg-transparent text-white d-flex align-items-center gap-4" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${wineId}" aria-expanded="false" aria-controls="collapse-${wineId}">
+          <img src="Flessen/${item.Naam}.png" alt="${item.Naam}" style="height:100px;object-fit:contain;" onerror="this.style.display='none';">
+          <div>
+            <div class="fw-bold" style="font-size:1.2em">${item.Naam}</div>
+            <div class="text-white" style="font-size:0.99em">${item["Beschrijving-Wijn"]}</div>
+          </div>
+        </button>
+      </h2>
+      <div id="collapse-${wineId}" class="accordion-collapse collapse" aria-labelledby="heading-${wineId}" data-bs-parent="#${accordionId}">
+        <div class="accordion-body">
+          <p><strong>Wijnhuis:</strong> ${item.Wijnhuis}</p>
+          <p><strong>Druivensoort:</strong> ${item.Druivensoort}</p>
+          <p><strong>Kleur:</strong> ${item.Kleur}</p>
+          <p><strong>Regio:</strong> ${item.Regio}</p>
+          ${item["Bijpassende-Gerechten"] ? `<p><strong>Bijpassende gerechten:</strong> ${item["Bijpassende-Gerechten"].join(', ')}</p>` : ""}
+          ${item.Smaken ? `<p><strong>Smaken:</strong> ${item.Smaken.join(', ')}</p>` : ""}
+          ${item.Smaakkenmerken ? `<p><strong>Smaakkenmerken:</strong> Fruit: ${item.Smaakkenmerken.Fruit}, Body: ${item.Smaakkenmerken.Body}, Tanine-Droog: ${item.Smaakkenmerken["Tanine-Droog"]}, Zuren: ${item.Smaakkenmerken.Zuren}</p>` : ""}
+        </div>
+      </div>
+    `;
+        accordion.appendChild(accItem);
       });
+
+      container.appendChild(accordion);
+      document.dispatchEvent(new Event('wijnkaartRendered'));
+
     }
+
 
 
     function renderWijnspijs(gerechten) {
@@ -228,34 +235,129 @@
         const div = document.createElement("div");
         div.className = "p-3 m-3 border rounded";
 
-        // Gerecht
+        // Gerechtnaam
         const gerecht = document.createElement("h4");
         gerecht.innerText = item["Gerecht"];
         div.appendChild(gerecht);
 
-        // Wijn 1
-        const wijn1Title = document.createElement("strong");
-        wijn1Title.innerText = `1: ${item["Wijn 1"]}`;
-        div.appendChild(wijn1Title);
-        div.appendChild(document.createElement("br"));
-        const beschrijving1 = document.createElement("p");
-        beschrijving1.innerText = item["Beschrijving 1"];
-        div.appendChild(beschrijving1);
+        // Voor beide wijnen
+        [1, 2].forEach(nr => {
+          const wrapper = document.createElement("div");
+          wrapper.className = "d-flex align-items-stretch";
 
-        // Wijn 2
-        const wijn2Title = document.createElement("strong");
-        wijn2Title.innerText = `2: ${item["Wijn 2"]}`;
-        div.appendChild(wijn2Title);
-        div.appendChild(document.createElement("br"));
-        const beschrijving2 = document.createElement("p");
-        beschrijving2.innerText = item["Beschrijving 2"];
-        div.appendChild(beschrijving2);
+          if (nr === 1) {
+            wrapper.style.marginBottom = "50px"; // <-- Alleen bij eerste wijn!
+          }// BELANGRIJK: align-items-stretch!
+
+          // Tekstdeel
+          const infoDiv = document.createElement("div");
+          infoDiv.style.flex = "1";
+          infoDiv.style.display = "flex";
+          infoDiv.style.flexDirection = "column";
+          infoDiv.style.justifyContent = "center";
+
+          // Wijnnaam
+          const wijnTitle = document.createElement("strong");
+          wijnTitle.innerText = `${nr}: ${item[`Wijn ${nr}`]}`;
+          wijnTitle.style.marginBottom = "6px";
+          infoDiv.appendChild(wijnTitle);
+
+          // Beschrijving
+          const beschrijving = document.createElement("div");
+          beschrijving.innerText = item[`Beschrijving ${nr}`];
+          infoDiv.appendChild(beschrijving);
+
+          // Afbeelding
+          const wijnImg = document.createElement("img");
+          wijnImg.src = `Flessen/${item[`Wijn ${nr}`]}.png`;
+          wijnImg.alt = item[`Wijn ${nr}`];
+          wijnImg.style.height = "100%";
+          wijnImg.style.maxHeight = "150px"; // optioneel, maximale hoogte
+          wijnImg.style.width = "auto";
+          wijnImg.style.objectFit = "contain";
+          wijnImg.style.marginLeft = "50px";
+          wijnImg.style.marginRight = "50px";
+          wijnImg.onerror = function () {
+            this.style.display = 'none';
+          };
+
+          // Buitenste flex: tekst links, plaatje rechts
+          wrapper.appendChild(infoDiv);
+          wrapper.appendChild(wijnImg);
+          div.appendChild(wrapper);
+        });
 
         container.appendChild(div);
       });
     }
 
+    // Highlight het bovenste zichtbare accordion-item bij scroll
+    document.addEventListener('DOMContentLoaded', function () {
+      const container = document.getElementById('wijnkaartResults');
+
+      function updateFeaturedItem() {
+        // Selecteer alle accordion-items binnen wijnkaartResults
+        const items = container.querySelectorAll('.accordion-item');
+        let featured = null;
+        let minDiff = Infinity;
+        const containerRect = container.getBoundingClientRect();
+
+        items.forEach(item => {
+          // Meet het verschil tussen de top van elk item en de container-top
+          const itemRect = item.getBoundingClientRect();
+          const diff = Math.abs(itemRect.top - containerRect.top);
+
+          if (itemRect.bottom > containerRect.top && itemRect.top < containerRect.bottom && diff < minDiff) {
+            minDiff = diff;
+            featured = item;
+          }
+        });
+
+        items.forEach(item => item.classList.remove('featured'));
+        if (featured) {
+          featured.classList.add('featured');
+        }
+      }
+
+      // Run zodra er gescrold wordt in wijnkaartResults
+      const wijnkaartDiv = document.getElementById('wijnkaartResults');
+      if (wijnkaartDiv) {
+        wijnkaartDiv.addEventListener('scroll', updateFeaturedItem);
+      }
+
+      // Run na het renderen van de wijnkaart (dus na laden)
+      document.addEventListener('wijnkaartRendered', updateFeaturedItem);
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const container = document.getElementById('wijnkaartResults');
+
+      // Scroll het aangeklikte accordion-item naar boven (binnen de container)
+      container.addEventListener('click', function (event) {
+        // Zoek het dichtstbijzijnde accordion-item van de klik
+        const accordionItem = event.target.closest('.accordion-item');
+        if (accordionItem && container.contains(accordionItem)) {
+          // Kleine vertraging zodat de collapse animatie kan starten (optioneel, voelt vloeiender)
+          setTimeout(function () {
+            // Toppositie van item t.o.v. container
+            const containerRect = container.getBoundingClientRect();
+            const itemRect = accordionItem.getBoundingClientRect();
+            const scrollOffset = itemRect.top - containerRect.top + container.scrollTop;
+
+            // Scroll het item smooth naar boven van de container
+            container.scrollTo({
+              top: scrollOffset,
+              behavior: 'smooth'
+            });
+          }, 120); // 120ms geeft een vloeiende overgang
+        }
+      }, true);
+    });
+
+
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 
 </body>
 
