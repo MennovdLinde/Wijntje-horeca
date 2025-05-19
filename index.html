@@ -199,7 +199,7 @@
 
       gerechten.forEach(item => {
         const div = document.createElement("div");
-        div.className = "p-3 m-3 border rounded";
+        div.className = "p-2 m-2 border rounded";
 
         // Gerechtnaam
         const gerecht = document.createElement("h4");
@@ -226,7 +226,8 @@
           // Wijnnaam with search icon
           const wijnTitle = document.createElement("strong");
           wijnTitle.innerText = `${nr}: ${item[`Wijn ${nr}`]}`;
-          wijnTitle.style.marginBottom = "6px";
+          wijnTitle.style.marginBottom = "1px";
+          wijnTitle.className = "wijnspijs-wine-title"; // <-- add class
 
           // Create magnifying glass SVG
           const searchIcon = document.createElement("span");
