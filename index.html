@@ -16,11 +16,13 @@
   <div id="home-screen" class="center-screen">
 
     <div class="button-screen">
-      <button class="btn custom-btn" id="wijnkaartBtn" onclick="handleWijnkaartClick()"><img src="images/buttons/Wijnkaart.png" alt="wijnkaart">Wijnkaart</button>
+      <button class="btn custom-btn" id="wijnkaartBtn" onclick="handleWijnkaartClick()"><img
+          src="images/buttons/Wijnkaart.png" alt="wijnkaart">Wijnkaart</button>
     </div>
 
     <div class="button-screen">
-      <button class="btn custom-btn" id="wijnspijsBtn" onclick="handleWijnspijsClick()"><img src="images/buttons/Wijnspijs.png" alt="wijnspijs">Wijnspijn</button>
+      <button class="btn custom-btn" id="wijnspijsBtn" onclick="handleWijnspijsClick()"><img
+          src="images/buttons/Wijnspijs.png" alt="wijnspijs">Wijnspijn</button>
 
     </div>
 
@@ -53,8 +55,12 @@
   <script>
     function goToScreen(screenId) {
       document.getElementById('home-screen').style.display = 'none';
+      // Hide all .screen elements first!
+      document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+      // Then show only the requested one
       document.getElementById(screenId).classList.add('active');
     }
+
 
     function goBack() {
       document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
@@ -217,10 +223,27 @@
           infoDiv.style.justifyContent = "center";
 
           // Wijnnaam
+          // Wijnnaam with search icon
           const wijnTitle = document.createElement("strong");
           wijnTitle.innerText = `${nr}: ${item[`Wijn ${nr}`]}`;
           wijnTitle.style.marginBottom = "6px";
+
+          // Create magnifying glass SVG
+          const searchIcon = document.createElement("span");
+          searchIcon.className = "search-wine-icon";
+          searchIcon.title = "Bekijk in wijnkaart";
+          searchIcon.setAttribute("data-wine", item[`Wijn ${nr}`]);
+          searchIcon.innerHTML = `
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" fill="none"/>
+              <line x1="16.5" y1="16.5" x2="21" y2="21" stroke="currentColor" stroke-width="2"/>
+            </svg>
+          `;
+
+          // Make clickable (will handle event later)
+          wijnTitle.appendChild(searchIcon);
           infoDiv.appendChild(wijnTitle);
+
 
           // Beschrijving
           const beschrijving = document.createElement("div");
@@ -309,6 +332,52 @@
         }
       }, true);
     });
+
+    let scrollToWineName = null; // Keeps track of which wine to open/scroll to
+
+    document.addEventListener('click', async function (e) {
+      const icon = e.target.closest('.search-wine-icon');
+      if (!icon) return;
+
+      const wineName = icon.getAttribute('data-wine').trim();
+      scrollToWineName = wineName; // Store globally
+
+      // Make sure wijnkaart is loaded and shown
+      // If already shown and loaded, just proceed. Otherwise, reload it.
+      // We force loading each time to ensure data is present and correct!
+      const response = await fetch('wijnkaart.json');
+      const wijnkaart = await response.json();
+
+      // Render wijnkaart and switch UI
+      renderWijnkaart(wijnkaart);
+      goToScreen('screen1');
+
+      // After rendering, open and scroll to the wine
+      setTimeout(() => {
+        openAndScrollToWine(wineName);
+      }, 120); // 120ms is enough after renderWijnkaart
+    });
+    // Helper function to open and scroll to a wine in the accordion
+    function openAndScrollToWine(wineName) {
+      const accordionItems = document.querySelectorAll('#wijnkaartResults .accordion-item');
+      for (const item of accordionItems) {
+        const header = item.querySelector('.accordion-header .fw-bold');
+        if (header && header.textContent.trim() === wineName) {
+          // Open accordion if not already open
+          const btn = item.querySelector('.accordion-button');
+          const isCollapsed = btn.classList.contains('collapsed');
+          if (isCollapsed) {
+            btn.click();
+          }
+          // Scroll item into view smoothly
+          item.scrollIntoView({behavior: 'smooth', block: 'start'});
+          // Add highlight
+          item.classList.add('featured');
+          setTimeout(() => item.classList.remove('featured'), 2000);
+          break;
+        }
+      }
+    }
 
 
   </script>

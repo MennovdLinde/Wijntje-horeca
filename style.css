@@ -144,6 +144,20 @@
         left: 20px;
     }
 
+    .search-wine-icon {
+        display: inline-flex;
+        align-items: center;
+        cursor: pointer;
+        margin-left: 10px;
+        /* Or another accent color */
+        transition: color 0.15s;
+    }
+
+    .search-wine-icon:hover {
+        color: #233a81;
+        filter: drop-shadow(0 1px 2px #aaa);
+    }
+
     @keyframes fadeIn {
         from {
             opacity: 0;
