@@ -1,0 +1,13 @@
+:root {
+  /* Gradient backgrounds */
+  --background: linear-gradient(135deg, #f8fafc 0%, #e3e6f3 100%);
+  --surface: transparent;
+  --button1: linear-gradient(135deg, #a4508b 0%, #5f0a87 100%);
+  --button2: linear-gradient(135deg, #43cea2 0%, #185a9d 100%);
+
+  /* Accent and text */
+  --accent: transparent;
+  --text-main: white;
+  --text-inverse: #fff;
+  --border: #e3e6f3;
+}

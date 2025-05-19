@@ -6,117 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Wijntje-horeca</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body,
-    html {
-      height: 100%;
-      margin: 0;
-      background: #f8f9fa;
-    }
-
-    .center-screen {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100%;
-    }
-
-    .accordion-item {
-      border-radius: 5px !important;
-      border: 1.5px solid #fff !important;
-      margin-bottom: 25px !important;
-      overflow: hidden;
-      transition: transform 0.32s cubic-bezier(.5, 1.4, .55, 1), box-shadow 0.32s;
-    }
-
-    .accordion-item.featured {
-      transform: scale(1.03);
-      box-shadow: 0 8px 26px rgba(0, 0, 0, 0.15);
-      z-index: 2;
-    }
-
-    .accordion .accordion-item:not(:first-child) {
-      border-top: 1.5px solid #fff !important;
-    }
-
-    .custom-btn {
-      width: 300px;
-      height: 300px;
-      padding: 20px;
-      margin: 20px 0;
-      font-size: 24px;
-      border-radius: 15px;
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-      transition: all 0.3s ease-in-out;
-    }
-
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none !important;
-      box-shadow: none;
-    }
-
-
-    .custom-btn:hover {
-      transform: scale(1.05);
-    }
-
-    .screen {
-      display: none;
-      height: 100%;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      animation: fadeIn 0.8s ease;
-    }
-
-    .screen.active {
-      display: flex;
-    }
-
-    #wijnkaartResults,
-    #wijnspijsResults {
-      max-height: 80vh;
-      overflow-y: auto;
-      background-color: rgba(255, 255, 255, 0.1);
-      color: white;
-      scrollbar-width: none;
-      -ms-overflow-style: none;
-    }
-
-    #wijnkaartResults::-webkit-scrollbar,
-    #wijnspijsResults::-webkit-scrollbar {
-      display: none;
-    }
-
-
-    .button-screen {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      margin: 20px;
-    }
-
-    #Terug {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translatex(30px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translatex(0);
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="colors.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -125,25 +16,27 @@
   <div id="home-screen" class="center-screen">
 
     <div class="button-screen">
-      <button class="btn btn-primary custom-btn" id="wijnkaartBtn" onclick="handleWijnkaartClick()">Wijnkaart</button>
+      <button class="btn custom-btn" id="wijnkaartBtn" onclick="handleWijnkaartClick()">Wijnkaart</button>
 
     </div>
 
     <div class="button-screen">
-      <button class="btn btn-success custom-btn" id="wijnspijsBtn" onclick="handleWijnspijsClick()">Wijnspijs</button>
+      <button class="btn custom-btn" id="wijnspijsBtn" onclick="handleWijnspijsClick()">Wijnspijs</button>
 
     </div>
 
   </div>
 
   <!-- Scherm 1 -->
-  <div id="screen1" class="screen bg-primary text-white">
-    <button class="btn btn-light mt-4" id="Terug" onclick="goBack()">Terug</button>
+  <div id="screen1" class="screen text-white">
+    <button class="btn mt-4" id="Terug" style="background: var(--button1); color: var(--text-main);"
+      onclick="goBack()">Terug</button>
     <div id="wijnkaartResults" class="text-start w-75 p-4"></div>
   </div>
 
-  <div id="screen2" class="screen bg-success text-white">
-    <button class="btn btn-light mt-4" id="Terug" onclick="goBack()">Terug</button>
+  <div id="screen2" class="screen text-white">
+    <button class="btn mt-4" id="Terug" style="background: var(--button2); color: var(--text-main);"
+      onclick="goBack()">Terug</button>
     <div id="wijnspijsResults" class="text-start w-75 p-4"></div>
   </div>
 
@@ -194,7 +87,17 @@
         const accItem = document.createElement("div");
         accItem.className = "accordion-item bg-transparent";
 
-        // HEADER: Titel, fles en beschrijving
+        let smaakkenmerken = {...item.Smaakkenmerken};
+        if (smaakkenmerken && smaakkenmerken['Tanine-Droog'] !== undefined) {
+          if (item.Kleur && item.Kleur.toLowerCase() === "rood") {
+            smaakkenmerken['Tanine'] = smaakkenmerken['Tanine-Droog'];
+          } else {
+            smaakkenmerken['Droog'] = smaakkenmerken['Tanine-Droog'];
+          }
+          delete smaakkenmerken['Tanine-Droog'];
+        }
+
+
         accItem.innerHTML = `
       <h2 class="accordion-header" id="heading-${wineId}">
         <button class="accordion-button collapsed bg-transparent text-white d-flex align-items-center gap-4" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${wineId}" aria-expanded="false" aria-controls="collapse-${wineId}">
@@ -206,14 +109,62 @@
         </button>
       </h2>
       <div id="collapse-${wineId}" class="accordion-collapse collapse" aria-labelledby="heading-${wineId}" data-bs-parent="#${accordionId}">
-        <div class="accordion-body">
-          <p><strong>Wijnhuis:</strong> ${item.Wijnhuis}</p>
-          <p><strong>Druivensoort:</strong> ${item.Druivensoort}</p>
-          <p><strong>Kleur:</strong> ${item.Kleur}</p>
-          <p><strong>Regio:</strong> ${item.Regio}</p>
-          ${item["Bijpassende-Gerechten"] ? `<p><strong>Bijpassende gerechten:</strong> ${item["Bijpassende-Gerechten"].join(', ')}</p>` : ""}
-          ${item.Smaken ? `<p><strong>Smaken:</strong> ${item.Smaken.join(', ')}</p>` : ""}
-          ${item.Smaakkenmerken ? `<p><strong>Smaakkenmerken:</strong> Fruit: ${item.Smaakkenmerken.Fruit}, Body: ${item.Smaakkenmerken.Body}, Tanine-Droog: ${item.Smaakkenmerken["Tanine-Droog"]}, Zuren: ${item.Smaakkenmerken.Zuren}</p>` : ""}
+        <div class="accordion-body text-white d-flex">
+          <div class="w-50 ms-5">
+            <p><strong>Wijnhuis:</strong> ${item.Wijnhuis}</p>
+            <p><strong>Druivensoort:</strong> ${item.Druivensoort}</p>
+            <p><strong>Kleur:</strong> ${item.Kleur}</p>
+            <p><strong>Regio:</strong> ${item.Regio}</p>
+            ${item["Bijpassende-Gerechten"] ? `
+            <p><strong>Bijpassende gerechten:</strong>
+              <span style="display:flex;gap:15px;flex-wrap:wrap; margin-top:12px;">
+                ${item["Bijpassende-Gerechten"].map(gerecht => `
+                  <span style="display:inline-flex;flex-direction:column;align-items:center;font-size:0.85em;">
+                    <img src="images/dishes/${gerecht.toLowerCase().replace(/\s+/g, '-')}.png" alt="${gerecht}" style="height:42px;width:42px;object-fit:contain;"/>
+                    <span>${gerecht}</span>
+                  </span>
+                `).join('')}
+              </span>
+            </p>
+          ` : ""}
+          </div>
+          <div class="w-50 ">
+          ${item.Smaken ? `
+            <p><strong>Smaken:</strong>
+              <span style="display:flex;gap:20px;flex-wrap:wrap;margin-top:12px;">
+                ${item.Smaken.map(smaak => `
+                  <span style="display:inline-flex;flex-direction:column;align-items:center;font-size:0.85em;">
+                    <img src="images/flavors/${smaak.toLowerCase().replace(/\s+/g, '-')}.png" alt="${smaak}" style="height:42px;width:42px;object-fit:contain;"/>
+                    <span>${smaak}</span>
+                  </span>
+                `).join('')}
+              </span>
+            </p>
+          ` : ""}
+          ${smaakkenmerken ? `
+            <div style="margin-top:12px;">
+              <strong>Smaakkenmerken:</strong>
+              <div class="d-flex flex-column gap-2 mt-2">
+                ${Object.entries(smaakkenmerken).map(([key, val]) => `
+                  <div style="display:flex;align-items:center;">
+                    <span style="width:70px;display:inline-block;">${key}:</span>
+                    ${[1, 2, 3, 4, 5].map(i => `
+                      <span style="
+                        display:inline-block;
+                        width:14px;height:14px;
+                        margin-right:3px;
+                        border-radius:50%;
+                        background: ${i <= val ? 'var(--text-main)' : 'var(--accent)'};
+                        border:1.2px solid #bbb;
+                      "></span>
+                    `).join('')}
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : ""}
+          </div>
+
         </div>
       </div>
     `;
@@ -342,13 +293,13 @@
             // Toppositie van item t.o.v. container
             const containerRect = container.getBoundingClientRect();
             const itemRect = accordionItem.getBoundingClientRect();
-            const scrollOffset = itemRect.top - containerRect.top + container.scrollTop;
-
-            // Scroll het item smooth naar boven van de container
+            const PADDING = 150; // adjust as you like, e.g. 20, 30, 40
+            const scrollOffset = itemRect.top - containerRect.top + container.scrollTop - PADDING;
             container.scrollTo({
               top: scrollOffset,
               behavior: 'smooth'
             });
+
           }, 120); // 120ms geeft een vloeiende overgang
         }
       }, true);

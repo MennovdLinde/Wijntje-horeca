@@ -1,0 +1,128 @@
+    body,
+    html {
+        background: var(--background);
+        color: var(--text-main);
+        height: 100%;
+    }
+
+    .center-screen {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+    }
+
+    .accordion-item {
+        border-radius: 5px !important;
+        margin-bottom: 25px !important;
+        overflow: hidden;
+        transition: transform 0.32s cubic-bezier(.5, 1.4, .55, 1), box-shadow 0.32s;
+        background: var(--surface);
+    }
+
+    .accordion-item.featured {
+        transform: scale(1.03);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        z-index: 2;
+    }
+
+    .accordion .accordion-item:not(:first-child) {
+        border-top: 1.5px solid var(--border) !important;
+    }
+
+    .accordion-button:focus,
+    .accordion-button:focus-visible,
+    .accordion-button:active {
+        box-shadow: none !important;
+    }
+
+    .custom-btn {
+        width: 300px;
+        height: 250px;
+        padding: 20px;
+        margin: 20px 0;
+        font-size: 24px;
+        border-radius: 15px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease-in-out;
+
+    }
+
+    .custom-btn:hover {
+        transform: scale(1.05);
+        filter: brightness(1.15);
+    }
+
+    #wijnkaartBtn {
+        background: var(--button1);
+        color: var(--text-main);
+    }
+
+    #wijnspijsBtn {
+        background: var(--button2);
+        color: var(--text-main);
+    }
+
+    .screen {
+        display: none;
+        height: 100%;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        animation: fadeIn 0.8s ease;
+        background: var(--background);
+        color: var(--text-main);
+    }
+
+    .screen.active {
+        display: flex;
+    }
+
+    #wijnkaartResults,
+    #wijnspijsResults {
+        max-height: 100vh;
+        overflow-y: auto;
+        color: var(--text-main);
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    #wijnkaartResults {
+        background: var(--button1);
+    }
+
+    #wijnspijsResults {
+        background: var(--button2);
+    }
+
+    #wijnkaartResults::-webkit-scrollbar,
+    #wijnspijsResults::-webkit-scrollbar {
+        display: none;
+    }
+
+
+    .button-screen {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin: 20px;
+    }
+
+    #Terug {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translatex(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translatex(0);
+        }
+    }
