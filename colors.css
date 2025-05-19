@@ -1,13 +1,12 @@
 :root {
-  /* Gradient backgrounds */
-  --background: linear-gradient(135deg, #f8fafc 0%, #e3e6f3 100%);
-  --surface: transparent;
-  --button1: linear-gradient(135deg, #a4508b 0%, #5f0a87 100%);
-  --button2: linear-gradient(135deg, #43cea2 0%, #185a9d 100%);
+  --background: linear-gradient(135deg, #f9fafb 0%, #f1f5f9 100%);
+  --surface: #fff;
+  --button1: linear-gradient(135deg, #5e96f1 0%, #4277e8 100%);
+  --button2: linear-gradient(135deg, #6ee7b7 0%, #19b27adf 100%);
 
-  /* Accent and text */
-  --accent: transparent;
+  --accent: #c7d2fe83;
   --text-main: white;
   --text-inverse: #fff;
-  --border: #e3e6f3;
+  --border: #e5e7eb;
 }
+

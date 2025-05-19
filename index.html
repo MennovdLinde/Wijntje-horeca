@@ -16,12 +16,11 @@
   <div id="home-screen" class="center-screen">
 
     <div class="button-screen">
-      <button class="btn custom-btn" id="wijnkaartBtn" onclick="handleWijnkaartClick()">Wijnkaart</button>
-
+      <button class="btn custom-btn" id="wijnkaartBtn" onclick="handleWijnkaartClick()"><img src="images/buttons/Wijnkaart.png" alt="wijnkaart">Wijnkaart</button>
     </div>
 
     <div class="button-screen">
-      <button class="btn custom-btn" id="wijnspijsBtn" onclick="handleWijnspijsClick()">Wijnspijs</button>
+      <button class="btn custom-btn" id="wijnspijsBtn" onclick="handleWijnspijsClick()"><img src="images/buttons/Wijnspijs.png" alt="wijnspijs">Wijnspijn</button>
 
     </div>
 
@@ -29,14 +28,24 @@
 
   <!-- Scherm 1 -->
   <div id="screen1" class="screen text-white">
-    <button class="btn mt-4" id="Terug" style="background: var(--button1); color: var(--text-main);"
-      onclick="goBack()">Terug</button>
+    <button class="btn mt-4" id="Terug" style="background: var(--button1); color: var(--text-main);" onclick="goBack()">
+      <svg width="1.5em" height="1.5em" viewBox="0 0 16 16" fill="currentColor" style="vertical-align:middle;">
+        <path fill-rule="evenodd"
+          d="M15 8a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 0 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 7.5H14.5A.5.5 0 0 1 15 8z" />
+      </svg>
+    </button>
+
     <div id="wijnkaartResults" class="text-start w-75 p-4"></div>
   </div>
 
   <div id="screen2" class="screen text-white">
-    <button class="btn mt-4" id="Terug" style="background: var(--button2); color: var(--text-main);"
-      onclick="goBack()">Terug</button>
+    <button class="btn mt-4" id="Terug" style="background: var(--button2); color: var(--text-main);" onclick="goBack()">
+      <svg width="1.5em" height="1.5em" viewBox="0 0 16 16" fill="currentColor" style="vertical-align:middle;">
+        <path fill-rule="evenodd"
+          d="M15 8a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 0 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 7.5H14.5A.5.5 0 0 1 15 8z" />
+      </svg>
+    </button>
+
     <div id="wijnspijsResults" class="text-start w-75 p-4"></div>
   </div>
 
@@ -101,10 +110,10 @@
         accItem.innerHTML = `
       <h2 class="accordion-header" id="heading-${wineId}">
         <button class="accordion-button collapsed bg-transparent text-white d-flex align-items-center gap-4" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${wineId}" aria-expanded="false" aria-controls="collapse-${wineId}">
-          <img src="Flessen/${item.Naam}.png" alt="${item.Naam}" style="height:100px;object-fit:contain;" onerror="this.style.display='none';">
+         <img src="Flessen/${item.Naam}.png" alt="${item.Naam}" class="wijnkaart-bottle" onerror="this.style.display='none';">
           <div>
-            <div class="fw-bold" style="font-size:1.2em">${item.Naam}</div>
-            <div class="text-white" style="font-size:0.99em">${item["Beschrijving-Wijn"]}</div>
+            <div class="fw-bold" id="wine-name">${item.Naam}</div>
+            <div class="text-white" id="wine-description">${item["Beschrijving-Wijn"]}</div>
           </div>
         </button>
       </h2>
@@ -222,15 +231,11 @@
           const wijnImg = document.createElement("img");
           wijnImg.src = `Flessen/${item[`Wijn ${nr}`]}.png`;
           wijnImg.alt = item[`Wijn ${nr}`];
-          wijnImg.style.height = "100%";
-          wijnImg.style.maxHeight = "150px"; // optioneel, maximale hoogte
-          wijnImg.style.width = "auto";
-          wijnImg.style.objectFit = "contain";
-          wijnImg.style.marginLeft = "50px";
-          wijnImg.style.marginRight = "50px";
+          wijnImg.className = "wijnspijs-bottle";
           wijnImg.onerror = function () {
             this.style.display = 'none';
           };
+
 
           // Buitenste flex: tekst links, plaatje rechts
           wrapper.appendChild(infoDiv);
