@@ -14,6 +14,7 @@
 
     .accordion-item {
         border-radius: 5px !important;
+        border: 1.5px solid var(--border1);
         margin-bottom: 25px !important;
         overflow: hidden;
         transition: transform 0.32s cubic-bezier(.5, 1.4, .55, 1), box-shadow 0.32s;
@@ -27,13 +28,15 @@
     }
 
     .accordion .accordion-item:not(:first-child) {
-        border-top: 1.5px solid var(--border) !important;
+        border-top: 1.5px solid var(--border1) !important;
     }
 
     .accordion-button:focus,
     .accordion-button:focus-visible,
     .accordion-button:active {
         box-shadow: none !important;
+        outline: none !important;
+        border: none !important;
     }
 
     .custom-btn {
@@ -111,17 +114,17 @@
     #wijnspijsResults {
         max-height: 100vh;
         overflow-y: auto;
-        color: var(--text-main);
+        color: black;
         scrollbar-width: none;
         -ms-overflow-style: none;
     }
 
     #wijnkaartResults {
-        background: var(--button1);
+        background: var(--background);
     }
 
     #wijnspijsResults {
-        background: var(--button2);
+        background: var(--background);
     }
 
     #wijnkaartResults::-webkit-scrollbar,

@@ -115,16 +115,16 @@
 
         accItem.innerHTML = `
       <h2 class="accordion-header" id="heading-${wineId}">
-        <button class="accordion-button collapsed bg-transparent text-white d-flex align-items-center gap-4" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${wineId}" aria-expanded="false" aria-controls="collapse-${wineId}">
+        <button class="accordion-button collapsed bg-transparent d-flex align-items-center gap-4" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${wineId}" aria-expanded="false" aria-controls="collapse-${wineId}">
          <img src="Flessen/${item.Naam}.png" alt="${item.Naam}" class="wijnkaart-bottle" onerror="this.style.display='none';">
           <div>
             <div class="fw-bold" id="wine-name">${item.Naam}</div>
-            <div class="text-white" id="wine-description">${item["Beschrijving-Wijn"]}</div>
+            <div id="wine-description">${item["Beschrijving-Wijn"]}</div>
           </div>
         </button>
       </h2>
       <div id="collapse-${wineId}" class="accordion-collapse collapse" aria-labelledby="heading-${wineId}" data-bs-parent="#${accordionId}">
-        <div class="accordion-body text-white d-flex">
+        <div class="accordion-body text-gray d-flex">
           <div class="w-50 ms-5">
             <p><strong>Wijnhuis:</strong> ${item.Wijnhuis}</p>
             <p><strong>Druivensoort:</strong> ${item.Druivensoort}</p>
@@ -169,7 +169,7 @@
                         width:14px;height:14px;
                         margin-right:3px;
                         border-radius:50%;
-                        background: ${i <= val ? 'var(--text-main)' : 'var(--accent)'};
+                        background: ${i <= val ? 'var(--accent)' : 'var(--text-inverse)'};
                         border:1.2px solid #bbb;
                       "></span>
                     `).join('')}
@@ -199,7 +199,7 @@
 
       gerechten.forEach(item => {
         const div = document.createElement("div");
-        div.className = "p-2 m-2 border rounded";
+        div.className = "p-2 m-2 border border-black rounded shadow-lg";
 
         // Gerechtnaam
         const gerecht = document.createElement("h4");
